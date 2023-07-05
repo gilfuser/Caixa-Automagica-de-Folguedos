@@ -8,16 +8,20 @@
 
 #define NUM_BUTTONS 6
 
-Encoder doze_horas(1, 2);
-Encoder dez_horas(4, 5);
-Encoder oito_horas(7, 8);
-Encoder seis_horas(10, 11);
-Encoder quatro_horas(19, 20);
-Encoder duas_horas(22, 23);
+Encoder enc_12h(1, 2);
+Encoder enc_10h(4, 5);
+Encoder enc_8h(7, 8);
+Encoder enc_6h(10, 11);
+Encoder enc_4h(19, 20);
+Encoder enc_2h(22, 23);
+// Encoder encoders[6] = { enc_12h, enc_10h, enc_8h, enc_6h, enc_4h, enc_2h};
 
 const uint8_t BUTTON_PINS[NUM_BUTTONS] = { 0, 3, 6, 9, 18, 21 };
 Bounce* buttons = new Bounce[NUM_BUTTONS];
 bool toggle = 0;  // variable for reading the pushbutton status
+
+u_char changes[14] = { 254, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255 };
+u_char old_changes[14] = { 254, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255 };
 
 void setup() {
   // 1) IF YOUR BUTTON HAS AN INTERNAL PULL-UP:
@@ -27,106 +31,86 @@ void setup() {
   for (int i = 0; i < NUM_BUTTONS; i++) {
     buttons[i].attach(BUTTON_PINS[i], INPUT);  // setup the bounce instance for the current button
     buttons[i].interval(5);                    // DEBOUNCE INTERVAL IN MILLISECONDS
-
-    // INDICATE THAT THE LOW STATE CORRESPONDS TO PHYSICALLY PRESSING THE BUTTON
-    button.setPressedState(LOW);
-    Serial.begin(38400);
   }
+  // INDICATE THAT THE LOW STATE CORRESPONDS TO PHYSICALLY PRESSING THE BUTTON
+  // button.setPressedState(LOW);
+  Serial.begin(38400);
+}
+
+bool checkArrays(u_char arrayA[], u_char arrayB[], byte numItems) {
+  bool same = true;
+  byte i = 1;
+  while (i <= numItems && same) {
+    same = arrayA[i] == arrayB[i];
+    i++;
+  }
+  return same;
+}
+
+  u_char enc_12h_old_position = 0;
+  u_char enc_12h_position = 0;
+  bool btn_12h_state = 0;  // variable for reading the pushbutton status
+  u_char enc_10h_old_position = 0;
+  u_char enc_10h_position = 0;
+  bool btn_10h_state = 0;
+  u_char enc_8h_old_position = 0;
+  u_char enc_8h_position = 0;
+  bool btn_8h_state = 0;
+  u_char enc_6h_old_position = 0;
+  u_char enc_6h_position = 0;
+  bool btn_6h_state = 0;
+  u_char enc_4h_old_position = 0;
+  u_char enc_4h_position = 0;
+  bool btn_4h_state = 0;
+  u_char enc_2h_old_position = 0;
+  u_char enc_2h_position = 0;
+  bool btn_2h_state = 0;
+
+void loop() {
+
+
+    enc_12h_position = enc_12h.read() % 256;
+    if ( changes[1] != enc_12h_position ) {
+      changes[1] = enc_12h_position;
+    }
+    enc_10h_position = enc_10h.read() % 256;
+    if (changes[2] != enc_10h_position) {
+      changes[2] = enc_10h_position;
+    }
+    enc_8h_position = enc_8h.read() % 256;
+    if (changes[3] != enc_8h_position) {
+      changes[3] = enc_8h_position;
+    }
+    enc_6h_position = enc_6h.read() % 256;
+    if ( changes[4] != enc_6h_position) {
+      changes[4] = enc_6h_position;
+    }
+    enc_4h_position = enc_4h.read() % 256;
+    if ( changes[5] != enc_4h_position ) {
+      changes[5] = enc_4h_position;
+    }
+    enc_2h_position = enc_2h.read() % 256;
+    if ( changes[6] != enc_2h_position) {
+      changes[6] = enc_2h_position;
+    }
 
   for (int i = 0; i < NUM_BUTTONS; i++) {
     // Update the Bounce instance :
     buttons[i].update();
-    // If it fell, flag the need to toggle the LED
     if (buttons[i].fell()) {
-      buttonState = !buttonState;
+      changes[i+7] = !changes[i+7];
     }
   }
 
-  u_char old_12h_position;
-  u_char _12h_position;
-//  bool old_12h_btn_state = 1;
-  bool _12h_btn_state = 0;  // variable for reading the pushbutton status
-  u_char old_10h_position;
-  u_char _10h_position;
- // bool old_10h_btn_state = 1;
-  bool _10h_btn_state = 0;  // variable for reading the pushbutton status
-  u_char old_8h_position;
-  u_char _8h_position;
-  // bool old_8h_btn_state = 1;
-  bool _8h_btn_state = 0;  // variable for reading the pushbutton status
-  u_char old_6h_position;
-  u_char _6h_position;
-  // bool old_6h_btn_state = 1;
-  bool _6h_btn_state = 0;  // variable for reading the pushbutton status
-  u_char old_4h_position;
-  u_char _4h_position;
-  // bool old_4h_btn_state = 1;
-  bool _4h_btn_state = 0;  // variable for reading the pushbutton status
-  u_char old_2h_position;
-  u_char _2h_position;
-  // bool _2h_btn_state = 1;
-  bool _2h_btn_state = 0;  // variable for reading the pushbutton status
-
-  void loop() {
-
-    for (int i = 0; i < NUM_BUTTONS; i++) {
-      // Update the Bounce instance :
-      buttons[i].update();
-      if (buttons[i].fell()) {
-        switch (buttons[i]) {
-          case 0:
-            _12h_btn_state = !=_12h_btn_state;
-            Serial.write(247);
-            Serial.write(_12h_btn_state);
-            Serial.write(248);
-            break;
-          case 1:
-            _10h_btn_state = !=_10h_btn_state;
-            Serial.write(245);
-            Serial.write(_10h_btn_state);
-            Serial.write(246);
-            break;
-          case 2:
-            _8h_btn_state = !=_8h_btn_state;
-            Serial.write(243);
-            Serial.write(_8h_btn_state);
-            Serial.write(244);
-            break;
-          case 3:
-            _6h_btn_state = !=_6h_btn_state;
-            Serial.write(241);
-            Serial.write(_6h_btn_state);
-            Serial.write(242);
-            break;
-          case 4:
-            _4h_btn_state = !=_4h_btn_state;
-            Serial.write(239);
-            Serial.write(_4h_btn_state);
-            Serial.write(240);
-            break;
-          case 5:
-            _2h_btn_state = !=_2h_btn_state;
-            Serial.write(237);
-            Serial.write(_2h_btn_state);
-            Serial.write(238);
-            break;
-        }
-      }
-    }
-
-    newPosition = doze_horas.read() % 256;
-    if (newPosition != oldPosition) {
-      oldPosition = newPosition;
-      oldBtnState = buttonState;
-      Serial.write(248);
-      Serial.write(249);
-      Serial.write(250);
-      Serial.write(252);
-      Serial.write(253);
-      Serial.write(254);
-      Serial.write(newPosition);
-      Serial.write(buttonState);
-      Serial.write(255);
-    }
-    delay(8);
+if(checkArrays(changes, old_changes, 12) == 0 ) {
+  Serial.write(changes, 14);
+} else {
+  Serial.write(0);
+}
+for ( int i = 1; i <= 12; i++ ) {
+  if ( changes[i] != old_changes[i] ) {
+    old_changes[i] = changes[i];
   }
+}
+delay(4);
+}
