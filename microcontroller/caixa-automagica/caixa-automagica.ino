@@ -16,7 +16,7 @@ Encoder enc_4h(19, 20);
 Encoder enc_2h(22, 23);
 // Encoder encoders[6] = { enc_12h, enc_10h, enc_8h, enc_6h, enc_4h, enc_2h};
 
-const uint8_t BUTTON_PINS[NUM_BUTTONS] = { 0, 3, 6, 9, 18, 21 };
+const uint8_t BUTTON_PINS[NUM_BUTTONS] = { 0, 3, 6, 9, 18, 12 };
 Bounce* buttons = new Bounce[NUM_BUTTONS];
 bool toggle = 0;  // variable for reading the pushbutton status
 
