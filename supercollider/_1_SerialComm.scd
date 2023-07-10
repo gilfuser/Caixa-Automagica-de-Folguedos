@@ -60,7 +60,7 @@ fork{
 };
 );
 MFdef(\botoes).add(\post, { |msg| msg.postln})
-MFdef(\botoes).enable(\post)
+MFdef(\botoes).disable(\post)
 Tdef(\readPort).gui
 q.btn_12h.value = 1
 q.btn_12h.get
